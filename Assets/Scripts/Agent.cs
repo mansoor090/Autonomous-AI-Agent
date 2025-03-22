@@ -1,6 +1,5 @@
 using UnityEngine;
 using AustinHarris.JsonRpc;
-using Unity.Hierarchy;
 
 
 public class MyVector3
@@ -76,17 +75,19 @@ public class Agent : MonoBehaviour
     {
         public float reward;
         public bool finished;
+        public bool truncate;
         public MyVector3 obs;
 
-        public RlResult(float reward, bool finished, MyVector3 obs)
+        public RlResult(float reward, bool finished, bool truncate, MyVector3 obs)
         {
             this.reward = reward;
             this.finished = finished;
+            this.truncate = truncate;
             this.obs = obs; 
         }
 
-
     }
+
 
 
     RPC rpc;
@@ -94,8 +95,13 @@ public class Agent : MonoBehaviour
     Simulation simulation;
     float reward = 0;
     bool finished = false;
+    bool truncated = false;
     int step = 0;
 
+    [SerializeField]int minX = 0;
+    [SerializeField]int maxX = 0;
+    [SerializeField]int minY = 0;
+    [SerializeField]int maxY = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -127,11 +133,11 @@ public class Agent : MonoBehaviour
                 direction = Vector3.right;
                 break;
         }
-        
-        Vector3 newPosition = transform.position + ((direction * 10) * simulation.SimulationStepSize);
-        newPosition.x = Mathf.Clamp(newPosition.x, -5f, 5f);
-        newPosition.y = 0;
-        newPosition.z = Mathf.Clamp(newPosition.z, -5f, 5f);
+
+        Vector3 newPosition = transform.position + direction;
+        newPosition.x = Mathf.Clamp(newPosition.x, minX, maxX);
+        newPosition.y = 1;
+        newPosition.z = Mathf.Clamp(newPosition.z, minY, maxY);
         transform.position = newPosition;
 
         simulation.Simulate();
@@ -140,10 +146,11 @@ public class Agent : MonoBehaviour
         if(step >= 1000)
         {
             Debug.Log("Ending Episode: Timeout");
-            finished = true;
+            finished = false;
+            truncated = true;
         }
 
-        return new RlResult(reward, finished, GetObservation());
+        return new RlResult(reward, finished, truncated, GetObservation());
     }
 
 
@@ -151,12 +158,22 @@ public class Agent : MonoBehaviour
     {
         transform.position = Vector3.zero;
 
-        target.transform.position = new Vector3(Random.Range(-5f,5f), 0, Random.Range(-5f, 5f));
+        transform.position = GetMinMax();
+        target.transform.position = GetMinMax();
 
+        while (transform.position == target.transform.position){
+            target.transform.position = GetMinMax();
+        }
+      
         finished = false;
+        truncated = false;
         step = 0;
 
         return GetObservation();
+    }
+
+    public Vector3 GetMinMax() {
+        return new Vector3(Random.Range(minX, maxX + 1), 1, Random.Range(minY, maxY + 1));
     }
 
     public MyVector3 GetObservation()
@@ -171,6 +188,12 @@ public class Agent : MonoBehaviour
             Debug.Log("Win");
             reward += 1;
             finished = true;
+        }
+        if (other.gameObject.CompareTag("Respawn"))
+        {
+            Debug.Log("Lost");
+            reward -= 1;
+            truncated = true;
         }
     }
 }
