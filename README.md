@@ -1,7 +1,7 @@
 # 🚀 Unity Autonomous Player Navigation with Reinforcement Learning
 
 
-### Python Repo: https://github.com/mansoor090/Python-RL
+
 
 
 
@@ -50,6 +50,36 @@ Open Unity project, import necessary scripts, and ensure the correct RPC ports a
 #### Testing the Agent
 
 `python test_rl.py --model PPO_Test_Model_1 --episodes 50`
+
+## 🥧 How Peaceful Pie Works (Unity-Python Communication)
+### Unity as RPC Server:
+Unity runs an RPC server, exposing methods that can be called remotely.
+Methods in Unity are marked with [JsonRpcMethod] attributes in your C# scripts.
+// Unity side (RPC server)
+
+`
+[JsonRpcMethod]
+RlResult Step(string action)
+{
+    return new RlResult(reward, finished, truncated, GetObservation());
+}
+`
+
+### Python as RPC Client:
+Python scripts connect to Unity's RPC server using the UnityComms class provided by Peaceful Pie.
+Methods defined in Unity can be directly invoked from Python, allowing Python to issue commands like moving an object or obtaining game state information.
+ Python side
+
+` unity_comms = UnityComms(port=9000) `
+
+ Calling Unity's Reset method 
+
+` initial_obs = unity_comms.Reset(ResultClass=MyVector3) `
+
+ Taking a Step in the environment by calling Step method on Unity side
+
+`result = unity_comms.Step(action='north', ResultClass=RlResult)`
+
 
 ### 📺 Demo
 
