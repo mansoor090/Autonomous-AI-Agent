@@ -18,20 +18,20 @@ public class MyVector3
 
     public Vector3 AsVector3()
     {
-        return new Vector3(x,y,z);
+        return new Vector3(x, y, z);
     }
 
 }
 
 public class Agent : MonoBehaviour
 {
-    
-    public class RPC: JsonRpcService
+
+    public class RPC : JsonRpcService
     {
         Agent agent;
         public RPC(Agent agent)
         {
-             this.agent = agent;
+            this.agent = agent;
         }
 
         [JsonRpcMethod]
@@ -83,7 +83,7 @@ public class Agent : MonoBehaviour
             this.reward = reward;
             this.finished = finished;
             this.truncate = truncate;
-            this.obs = obs; 
+            this.obs = obs;
         }
 
     }
@@ -98,10 +98,10 @@ public class Agent : MonoBehaviour
     bool truncated = false;
     int step = 0;
 
-    [SerializeField]int minX = 0;
-    [SerializeField]int maxX = 0;
-    [SerializeField]int minY = 0;
-    [SerializeField]int maxY = 0;
+    [SerializeField] int minX = 0;
+    [SerializeField] int maxX = 0;
+    [SerializeField] int minY = 0;
+    [SerializeField] int maxY = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -109,7 +109,7 @@ public class Agent : MonoBehaviour
         simulation = GetComponent<Simulation>();
         rpc = new RPC(this);
 
-     }
+    }
 
     // Update is called once per frame
     RlResult Step(string action)
@@ -143,7 +143,7 @@ public class Agent : MonoBehaviour
         simulation.Simulate();
         step += 1;
 
-        if(step >= 1000)
+        if (step >= 1000)
         {
             Debug.Log("Ending Episode: Timeout");
             finished = false;
@@ -161,10 +161,11 @@ public class Agent : MonoBehaviour
         transform.position = GetMinMax();
         target.transform.position = GetMinMax();
 
-        while (transform.position == target.transform.position){
+        while (transform.position == target.transform.position)
+        {
             target.transform.position = GetMinMax();
         }
-      
+
         finished = false;
         truncated = false;
         step = 0;
@@ -172,7 +173,8 @@ public class Agent : MonoBehaviour
         return GetObservation();
     }
 
-    public Vector3 GetMinMax() {
+    public Vector3 GetMinMax()
+    {
         return new Vector3(Random.Range(minX, maxX + 1), 1, Random.Range(minY, maxY + 1));
     }
 
