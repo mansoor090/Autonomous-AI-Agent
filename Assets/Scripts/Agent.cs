@@ -1,5 +1,6 @@
 using UnityEngine;
 using AustinHarris.JsonRpc;
+using System.Threading;
 
 
 public class MyVector3
@@ -7,7 +8,6 @@ public class MyVector3
     public float x;
     public float y;
     public float z;
-
 
     public MyVector3(Vector3 v)
     {
@@ -20,11 +20,17 @@ public class MyVector3
     {
         return new Vector3(x, y, z);
     }
-
 }
 
 public class Agent : MonoBehaviour
 {
+
+    public class Observations
+    {
+        public MyVector3 distanceToTarget;
+        public MyVector3 hurdlesPositions;
+
+    }
 
     public class RPC : JsonRpcService
     {
@@ -65,7 +71,7 @@ public class Agent : MonoBehaviour
         }
 
         [JsonRpcMethod]
-        MyVector3 Reset()
+        Observations Reset()
         {
             return agent.Reset();
         }
@@ -76,9 +82,9 @@ public class Agent : MonoBehaviour
         public float reward;
         public bool finished;
         public bool truncate;
-        public MyVector3 obs;
+        public Observations obs;
 
-        public RlResult(float reward, bool finished, bool truncate, MyVector3 obs)
+        public RlResult(float reward, bool finished, bool truncate, Observations obs)
         {
             this.reward = reward;
             this.finished = finished;
@@ -96,12 +102,14 @@ public class Agent : MonoBehaviour
     float reward = 0;
     bool finished = false;
     bool truncated = false;
-    int step = 0;
+    int stepCount = 0;
 
     [SerializeField] int minX = 0;
     [SerializeField] int maxX = 0;
     [SerializeField] int minY = 0;
     [SerializeField] int maxY = 0;
+
+    [SerializeField] private Transform[] hurdles;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -141,34 +149,31 @@ public class Agent : MonoBehaviour
         transform.position = newPosition;
 
         simulation.Simulate();
-        step += 1;
+        stepCount += 1;
 
-        if (step >= 1000)
+        if (stepCount >= 1000)
         {
             Debug.Log("Ending Episode: Timeout");
             finished = false;
             truncated = true;
         }
 
+        Thread.Sleep(200);
+
         return new RlResult(reward, finished, truncated, GetObservation());
     }
 
 
-    public MyVector3 Reset()
+    public Observations Reset()
     {
         transform.position = Vector3.zero;
 
-        transform.position = GetMinMax();
-        target.transform.position = GetMinMax();
-
-        while (transform.position == target.transform.position)
-        {
-            target.transform.position = GetMinMax();
-        }
+        transform.position = GetNewPosition();
+        target.transform.position = GetNewPosition();
 
         finished = false;
         truncated = false;
-        step = 0;
+        stepCount = 0;
 
         return GetObservation();
     }
@@ -178,9 +183,12 @@ public class Agent : MonoBehaviour
         return new Vector3(Random.Range(minX, maxX + 1), 1, Random.Range(minY, maxY + 1));
     }
 
-    public MyVector3 GetObservation()
+    public Observations GetObservation()
     {
-        return new MyVector3(target.transform.position - transform.position);
+        Observations obs = new Observations();
+        obs.distanceToTarget = new MyVector3(target.transform.position - transform.position);
+        obs.hurdlesPositions = new MyVector3(hurdles[0].position);
+        return obs;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -198,4 +206,36 @@ public class Agent : MonoBehaviour
             truncated = true;
         }
     }
+
+    private bool IsPositionOccupied(Vector3 position)
+    {
+
+        bool isOccupied = false;
+
+        foreach (Transform hurdle in hurdles)
+        {
+            if (hurdle.position.x == position.x && hurdle.position.z == position.z)
+            {
+                isOccupied = true;
+            }
+        }
+        return isOccupied; // Position is free
+    }
+
+    private Vector3 GetNewPosition()
+    {
+
+        Vector3 newPosition = GetMinMax();
+
+        // check if new position is occupied... else return newposition
+        while (IsPositionOccupied(newPosition))
+        {
+            newPosition = GetMinMax();
+        }
+        return newPosition;
+
+
+    }
+
+
 }

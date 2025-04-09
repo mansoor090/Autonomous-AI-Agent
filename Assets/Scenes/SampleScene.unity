@@ -3426,7 +3426,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 9.97
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -3451,7 +3451,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.6, y: 12, z: 8}
+  m_LocalPosition: {x: 0, y: 12, z: 8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18088,6 +18088,17 @@ MonoBehaviour:
   maxX: 6
   minY: 0
   maxY: 15
+  hurdles:
+  - {fileID: 1239868209}
+  - {fileID: 1184658692}
+  - {fileID: 1492431380}
+  - {fileID: 639489930}
+  - {fileID: 1659745036}
+  - {fileID: 648481317}
+  - {fileID: 1315311152}
+  - {fileID: 1653916676}
+  - {fileID: 1133568985}
+  - {fileID: 969550964}
 --- !u!114 &1981097099
 MonoBehaviour:
   m_ObjectHideFlags: 0
