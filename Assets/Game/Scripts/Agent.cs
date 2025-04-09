@@ -1,6 +1,6 @@
 using UnityEngine;
 using AustinHarris.JsonRpc;
-using UnityEngine.Events;
+using System.Threading;
 
 
 public class MyVector3
@@ -8,7 +8,6 @@ public class MyVector3
     public float x;
     public float y;
     public float z;
-
 
     public MyVector3(Vector3 v)
     {
@@ -19,20 +18,26 @@ public class MyVector3
 
     public Vector3 AsVector3()
     {
-        return new Vector3(x,y,z);
+        return new Vector3(x, y, z);
     }
-
 }
 
 public class Agent : MonoBehaviour
 {
-    
-    public class RPC: JsonRpcService
+
+    public class Observations
+    {
+        public MyVector3 distanceToTarget;
+        public MyVector3 hurdlesPositions;
+
+    }
+
+    public class RPC : JsonRpcService
     {
         Agent agent;
         public RPC(Agent agent)
         {
-             this.agent = agent;
+            this.agent = agent;
         }
 
         [JsonRpcMethod]
@@ -66,7 +71,7 @@ public class Agent : MonoBehaviour
         }
 
         [JsonRpcMethod]
-        MyVector3 Reset()
+        Observations Reset()
         {
             return agent.Reset();
         }
@@ -77,19 +82,19 @@ public class Agent : MonoBehaviour
         public float reward;
         public bool finished;
         public bool truncate;
-        public MyVector3 obs;
+        public Observations obs;
 
-        public RlResult(float reward, bool finished, bool truncate, MyVector3 obs)
+        public RlResult(float reward, bool finished, bool truncate, Observations obs)
         {
             this.reward = reward;
             this.finished = finished;
             this.truncate = truncate;
-            this.obs = obs; 
+            this.obs = obs;
         }
 
     }
-    private UIHandler UIHandler;
-    
+
+
 
     RPC rpc;
     public GameObject target;
@@ -97,23 +102,22 @@ public class Agent : MonoBehaviour
     float reward = 0;
     bool finished = false;
     bool truncated = false;
-    int step = 0;
+    int stepCount = 0;
 
+    [SerializeField] int minX = 0;
+    [SerializeField] int maxX = 0;
+    [SerializeField] int minY = 0;
+    [SerializeField] int maxY = 0;
 
-    [SerializeField]int minX = 0;
-    [SerializeField]int maxX = 0;
-    [SerializeField]int minY = 0;
-    [SerializeField]int maxY = 0;
+    [SerializeField] private Transform[] hurdles;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        UIHandler = FindAnyObjectByType<UIHandler>();
-
         simulation = GetComponent<Simulation>();
         rpc = new RPC(this);
 
-     }
+    }
 
     // Update is called once per frame
     RlResult Step(string action)
@@ -145,48 +149,46 @@ public class Agent : MonoBehaviour
         transform.position = newPosition;
 
         simulation.Simulate();
-        step += 1;
-        // update UI
-        UIHandler.UpdateSteps(step);
-        UIHandler.UpdateEpisodes(1);
+        stepCount += 1;
 
-        if(step >= 1000)
+        if (stepCount >= 1000)
         {
             Debug.Log("Ending Episode: Timeout");
             finished = false;
             truncated = true;
-            UIHandler.UpdateFailure(1, true);
         }
+
+        Thread.Sleep(200);
 
         return new RlResult(reward, finished, truncated, GetObservation());
     }
 
 
-    public MyVector3 Reset()
+    public Observations Reset()
     {
         transform.position = Vector3.zero;
 
-        transform.position = GetMinMax();
-        target.transform.position = GetMinMax();
+        transform.position = GetNewPosition();
+        target.transform.position = GetNewPosition();
 
-        while (transform.position == target.transform.position){
-            target.transform.position = GetMinMax();
-        }
-      
         finished = false;
         truncated = false;
-        step = 0;
+        stepCount = 0;
 
         return GetObservation();
     }
 
-    public Vector3 GetMinMax() {
+    public Vector3 GetMinMax()
+    {
         return new Vector3(Random.Range(minX, maxX + 1), 1, Random.Range(minY, maxY + 1));
     }
 
-    public MyVector3 GetObservation()
+    public Observations GetObservation()
     {
-        return new MyVector3(target.transform.position - transform.position);
+        Observations obs = new Observations();
+        obs.distanceToTarget = new MyVector3(target.transform.position - transform.position);
+        obs.hurdlesPositions = new MyVector3(hurdles[0].position);
+        return obs;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -196,14 +198,44 @@ public class Agent : MonoBehaviour
             Debug.Log("Win");
             reward += 1;
             finished = true;
-            UIHandler.UpdateSuccess(1);
         }
         if (other.gameObject.CompareTag("Respawn"))
         {
             Debug.Log("Lost");
             reward -= 1;
             truncated = true;
-            UIHandler.UpdateFailure(1, false);
         }
     }
+
+    private bool IsPositionOccupied(Vector3 position)
+    {
+
+        bool isOccupied = false;
+
+        foreach (Transform hurdle in hurdles)
+        {
+            if (hurdle.position.x == position.x && hurdle.position.z == position.z)
+            {
+                isOccupied = true;
+            }
+        }
+        return isOccupied; // Position is free
+    }
+
+    private Vector3 GetNewPosition()
+    {
+
+        Vector3 newPosition = GetMinMax();
+
+        // check if new position is occupied... else return newposition
+        while (IsPositionOccupied(newPosition))
+        {
+            newPosition = GetMinMax();
+        }
+        return newPosition;
+
+
+    }
+
+
 }
