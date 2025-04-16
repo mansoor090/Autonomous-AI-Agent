@@ -6048,7 +6048,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &639489930
 Transform:
   m_ObjectHideFlags: 0
@@ -6242,7 +6242,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &648481317
 Transform:
   m_ObjectHideFlags: 0
@@ -7665,7 +7665,7 @@ Transform:
   m_GameObject: {fileID: 832575517}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -4.94}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8549,7 +8549,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &969550964
 Transform:
   m_ObjectHideFlags: 0
@@ -9517,7 +9517,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1133568985
 Transform:
   m_ObjectHideFlags: 0
@@ -10049,6 +10049,7 @@ GameObject:
   - component: {fileID: 1184658694}
   - component: {fileID: 1184658693}
   - component: {fileID: 1184658695}
+  - component: {fileID: 1184658696}
   m_Layer: 0
   m_Name: Water
   m_TagString: Respawn
@@ -10065,7 +10066,7 @@ Transform:
   m_GameObject: {fileID: 1184658691}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3, y: 1, z: 5}
+  m_LocalPosition: {x: -5, y: 1, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10145,6 +10146,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1184658696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1184658691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 548ddbd62c73982499292404ba03a1e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveAxis: 2
+  speed: 2
+  distance: 3
+  currentDistance: 0
+  increment: 1
+  MaxSteps: 100
 --- !u!1 &1199534921
 GameObject:
   m_ObjectHideFlags: 0
@@ -10243,13 +10262,14 @@ GameObject:
   - component: {fileID: 1239868211}
   - component: {fileID: 1239868210}
   - component: {fileID: 1239868212}
+  - component: {fileID: 1239868213}
   m_Layer: 0
   m_Name: Water
   m_TagString: Respawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1239868209
 Transform:
   m_ObjectHideFlags: 0
@@ -10339,6 +10359,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1239868213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1239868208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 548ddbd62c73982499292404ba03a1e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveAxis: 2
+  speed: 2
+  distance: 3
+  currentDistance: 0
+  increment: 1
+  MaxSteps: 10
 --- !u!1 &1246712726
 GameObject:
   m_ObjectHideFlags: 0
@@ -11303,7 +11341,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1315311152
 Transform:
   m_ObjectHideFlags: 0
@@ -13131,7 +13169,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1492431380
 Transform:
   m_ObjectHideFlags: 0
@@ -14820,7 +14858,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1653916676
 Transform:
   m_ObjectHideFlags: 0
@@ -14928,7 +14966,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1659745036
 Transform:
   m_ObjectHideFlags: 0
@@ -18084,6 +18122,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 100121156}
+  hurdle: {fileID: 1184658696}
   minX: -6
   maxX: 6
   minY: 0

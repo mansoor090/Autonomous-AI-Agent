@@ -31,7 +31,7 @@ public class Agent : MonoBehaviour
         Agent agent;
         public RPC(Agent agent)
         {
-             this.agent = agent;
+            this.agent = agent;
         }
 
         [JsonRpcMethod]
@@ -65,20 +65,28 @@ public class Agent : MonoBehaviour
         }
 
         [JsonRpcMethod]
-        MyVector3 Reset()
+        Observations Reset()
         {
             return agent.Reset();
         }
     }
+
+    public class Observations{
+
+        // distance to target;
+        public MyVector3 dist_to_target;
+        public MyVector3 hurdle_pos;
+    }
+
 
     public class RlResult
     {
         public float reward;
         public bool finished;
         public bool truncate;
-        public MyVector3 obs;
+         public Observations obs;        
 
-        public RlResult(float reward, bool finished, bool truncate, MyVector3 obs)
+        public RlResult(float reward, bool finished, bool truncate, Observations obs)
         {
             this.reward = reward;
             this.finished = finished;
@@ -92,6 +100,7 @@ public class Agent : MonoBehaviour
 
     RPC rpc;
     public GameObject target;
+    public ToFro hurdle;
     Simulation simulation;
     float reward = 0;
     bool finished = false;
@@ -108,7 +117,6 @@ public class Agent : MonoBehaviour
     {
         simulation = GetComponent<Simulation>();
         rpc = new RPC(this);
-
      }
 
     // Update is called once per frame
@@ -149,12 +157,12 @@ public class Agent : MonoBehaviour
             finished = false;
             truncated = true;
         }
-
+        
         return new RlResult(reward, finished, truncated, GetObservation());
     }
 
 
-    public MyVector3 Reset()
+    public Observations Reset()
     {
         transform.position = Vector3.zero;
 
@@ -164,7 +172,11 @@ public class Agent : MonoBehaviour
         while (transform.position == target.transform.position){
             target.transform.position = GetMinMax();
         }
-      
+
+        // hurdle reset
+        hurdle.Reset();        
+
+
         finished = false;
         truncated = false;
         step = 0;
@@ -176,9 +188,13 @@ public class Agent : MonoBehaviour
         return new Vector3(Random.Range(minX, maxX + 1), 1, Random.Range(minY, maxY + 1));
     }
 
-    public MyVector3 GetObservation()
+    public Observations GetObservation()
     {
-        return new MyVector3(target.transform.position - transform.position);
+        Observations obs = new Observations();
+        obs.dist_to_target = new MyVector3(target.transform.position - transform.position);
+        obs.hurdle_pos = new MyVector3(hurdle.transform.position);
+
+       return obs;
     }
 
     private void OnTriggerEnter(Collider other)
