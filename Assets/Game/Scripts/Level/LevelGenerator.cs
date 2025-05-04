@@ -8,7 +8,7 @@ using UnityEditor;
 [System.Serializable]
 public class LevelDimensionBoundary
 {
-    public Vector2 dimension;
+    public Vector2Int dimension;
 }
 
 
@@ -70,9 +70,13 @@ public class LevelGenerator : MonoBehaviour
 
     public void PlacePrefab(Vector3 mouseWorldPos)
     {
+#if UNITY_EDITOR
         Vector3Int gridPosInt = WorldToGrid(mouseWorldPos);
         Vector3 gridPos = new Vector3(gridPosInt.x, selectedPrefabType.defaultYHeight, gridPosInt.z);
 
+        gridPos.x = Mathf.Clamp(gridPos.x, 0 , levelDimension.dimension.x);
+        gridPos.z = Mathf.Clamp(gridPos.z, 0 , levelDimension.dimension.y);
+        
         if (!IsPositionOccupied(gridPos))
         {
             // clamp position
@@ -84,22 +88,9 @@ public class LevelGenerator : MonoBehaviour
             {
                 gridPos.z = 0;
             }
-
-            // calculate level boundary 
-            if (levelDimension.dimension.x < gridPos.x)
-            {
-                levelDimension.dimension.x = gridPos.x;
-            }
-
-            if (levelDimension.dimension.y < gridPos.z)
-            {
-                levelDimension.dimension.y = gridPos.z;
-            }
-
+            
             GameObject obj = PrefabUtility.InstantiatePrefab(selectedPrefabType.prefab) as GameObject;
-           
-           
-
+            
             int childCount = transform.childCount;
 
             if(childCount > 0)
@@ -143,13 +134,14 @@ public class LevelGenerator : MonoBehaviour
                 prefab = obj
             });
         }
+#endif
     }
 
     public void RemovePrefab(Vector3 mouseWorldPos)
     {
         Vector3Int gridPosInt = WorldToGrid(mouseWorldPos);
         Vector3 gridPos = new Vector3(gridPosInt.x, selectedPrefabType.defaultYHeight, gridPosInt.z);
-
+        
         foreach (var group in placedPrefabGroups)
         {
             var placed = group.prefabs.Find(p => p.position == gridPos);
@@ -175,7 +167,9 @@ public class LevelGenerator : MonoBehaviour
 
         Vector3Int gridPosInt = WorldToGrid(mouseWorldPos);
         Vector3 worldPos = new Vector3(gridPosInt.x, selectedPrefabType != null ? selectedPrefabType.defaultYHeight : 0f, gridPosInt.z);
-
+        worldPos.x = Mathf.Clamp(worldPos.x, 0 , levelDimension.dimension.x);
+        worldPos.z = Mathf.Clamp(worldPos.z, 0 , levelDimension.dimension.y);
+        
         if (previewObject != null)
         {
             previewObject.transform.position = worldPos;
@@ -243,4 +237,50 @@ public class LevelGenerator : MonoBehaviour
         }
         placedPrefabGroups.Clear();
     }
+    
+    
+    
+    
+    
+    ////////////////////////////////////////
+    /// helping methods
+    ///
+    ///
+    /////////////////////////////////////////
+    
+    
+    public List<Vector3> GetAllSimpleNodes()
+    {
+        List<Vector3> simpleNodes = new List<Vector3>();
+        foreach (var group in placedPrefabGroups)
+        {
+            Debug.Log("group.typeName" + group.typeName);
+            if (group.typeName.ToLower().Contains("simple")) // adjust as needed
+            {
+                foreach (var placed in group.prefabs)
+                {
+                    simpleNodes.Add(placed.position);
+                }
+            }
+        }
+        return simpleNodes;
+    }
+    
+    
+    public List<Vector3> GetAllHurdlesNodes()
+    {
+        List<Vector3> hurdles = new List<Vector3>();
+        foreach (var group in placedPrefabGroups)
+        {
+            if (group.typeName.ToLower().Contains("lake")) // adjust as needed
+            {
+                foreach (var placed in group.prefabs)
+                {
+                    hurdles.Add(placed.position);
+                }
+            }
+        }
+        return hurdles;
+    }
+    
 }

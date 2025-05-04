@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PathFinder : MonoBehaviour
@@ -44,27 +45,12 @@ public class PathFinder : MonoBehaviour
 
 
 
-    List<Vector3> GetAllSimpleNodes()
-    {
-        List<Vector3> simpleNodes = new List<Vector3>();
-        foreach (var group in levelData.placedPrefabGroups)
-        {
-            if (group.typeName.ToLower() == "simple") // adjust as needed
-            {
-                foreach (var placed in group.prefabs)
-                {
-                    simpleNodes.Add(placed.position);
-                }
-            }
-        }
-        return simpleNodes;
-    }
 
 
     public List<Vector3> FindShortestPath(Vector3 startPos, Vector3 endPos)
     {
         // 1. Collect only Simple prefabs
-        List<Vector3> simpleNodes = GetAllSimpleNodes();
+        List<Vector3> simpleNodes = levelData.GetAllSimpleNodes();
 
         endPos.y = 0;
         startPos.y = 0;

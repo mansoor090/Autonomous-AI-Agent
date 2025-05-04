@@ -4,10 +4,12 @@ using UnityEngine;
 public class UIHandler : MonoBehaviour
 {
     
+    public TextMeshProUGUI myPort;
     public TextMeshProUGUI steps;
     public TextMeshProUGUI episodes;
     public TextMeshProUGUI success;
     public TextMeshProUGUI failure;
+    public TextMeshProUGUI rate;
 
 
     private int step_count;
@@ -15,32 +17,44 @@ public class UIHandler : MonoBehaviour
     private int success_count;
     private int failure_count;
     
+    public void UpdatePort(int port)
+    {
+        myPort.text = "Port: " + port.ToString();
+    }
     public void UpdateSteps(int amount)
     {
-        step_count = amount;
-        steps.text = step_count.ToString();
+        step_count += amount;
+        steps.text = "Step: " +step_count.ToString();
     }
 
     public void UpdateEpisodes(int amount)
     {
         episode_count++;
-        episodes.text = episode_count.ToString();
+        episodes.text = "EP: " + episode_count.ToString();
     }
 
 
     public void UpdateSuccess(int amount)
     {
         success_count += amount;
-        success.text = success_count.ToString();
-       
+        success.text = "Win: " + success_count.ToString();
+        UpdateRate();
     }
 
 
     public void UpdateFailure(int amount, bool isTimed)
     {
         failure_count += amount;
-        failure.text += amount.ToString();
+        failure.text = "Lost: " + failure_count.ToString();
         failure.color = isTimed ? Color.red : Color.yellow;
+        UpdateRate();
+    }
+
+    private void UpdateRate()
+    {
+        if(success_count > 0 && failure_count > 0)
+            rate.text = "%: " + (((float)success_count / (float)(success_count + failure_count)) * 100).ToString("F1");
+    
     }
 
 }

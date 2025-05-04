@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
@@ -67,7 +68,6 @@ public class LevelGeneratorEditor : Editor
         DrawDefaultInspector();
 
         LevelGenerator generator = (LevelGenerator)target;
-
         GUILayout.Space(10);
         GUILayout.Label("Select Prefab Type:", EditorStyles.boldLabel);
 
@@ -88,3 +88,4 @@ public class LevelGeneratorEditor : Editor
         }
     }
 }
+#endif
