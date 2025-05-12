@@ -254,7 +254,7 @@ public class LevelGenerator : MonoBehaviour
         List<Vector3> simpleNodes = new List<Vector3>();
         foreach (var group in placedPrefabGroups)
         {
-            Debug.Log("group.typeName" + group.typeName);
+            // Debug.Log("group.typeName" + group.typeName);
             if (group.typeName.ToLower().Contains("simple")) // adjust as needed
             {
                 foreach (var placed in group.prefabs)
@@ -272,7 +272,7 @@ public class LevelGenerator : MonoBehaviour
         List<Vector3> hurdles = new List<Vector3>();
         foreach (var group in placedPrefabGroups)
         {
-            if (group.typeName.ToLower().Contains("lake")) // adjust as needed
+            if (group.typeName.ToLower().Contains("hurdle")) // adjust as needed
             {
                 foreach (var placed in group.prefabs)
                 {

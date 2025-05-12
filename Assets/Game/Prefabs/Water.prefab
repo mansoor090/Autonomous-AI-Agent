@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 5279419401067319878}
   - component: {fileID: 4789331957907926301}
   - component: {fileID: 1850580245212605939}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Cube_Water
   m_TagString: Water
   m_Icon: {fileID: 0}

@@ -11,12 +11,15 @@ public class PathFinder : MonoBehaviour
     public LineRenderer lineRenderer;
     public Agent agent;
 
+    public int pathLength = 0;
+
     [ContextMenu("UpdateRender")]
     public void UpdateRender()
     {
         var path = FindShortestPath(agent.transform.position, agent.target.transform.position);
         lineRenderer.positionCount = path.Count;
         lineRenderer.SetPositions(path.ToArray());
+        pathLength = path.Count;
     }
 
     List<Vector3> GetNeighbors(Vector3 node, List<Vector3> allNodes)
@@ -91,7 +94,7 @@ public class PathFinder : MonoBehaviour
         }
         path.Add(startPos);
         path.Reverse();
-        Debug.Log("Path Generated");
+        // Debug.Log("Path Generated");
 
         return path;
     }
