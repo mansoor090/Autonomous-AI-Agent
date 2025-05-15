@@ -9,6 +9,7 @@ public class UIHandler : MonoBehaviour
     public TextMeshProUGUI episodes;
     public TextMeshProUGUI success;
     public TextMeshProUGUI failure;
+    public TextMeshProUGUI failureReason;
     public TextMeshProUGUI rate;
 
 
@@ -48,12 +49,18 @@ public class UIHandler : MonoBehaviour
         failure.text = "Lost: " + failure_count.ToString();
         failure.color = isTimed ? Color.red : Color.yellow;
         UpdateRate();
+    } 
+    
+    public void UpdateFailure(string msg)
+    {
+        failureReason.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+        failureReason.text = "Env Reset Due to:" + msg;
     }
 
     private void UpdateRate()
     {
         if(success_count > 0 && failure_count > 0)
-            rate.text = "%: " + (((float)success_count / (float)(success_count + failure_count)) * 100).ToString("F1");
+            rate.text = "Ratio: " + (((float)success_count / (float)(success_count + failure_count)) * 100).ToString("F1") + "%";
     
     }
 

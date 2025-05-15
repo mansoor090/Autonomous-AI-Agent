@@ -7,10 +7,11 @@ using UnityEngine;
 public class PathFinder : MonoBehaviour
 {
 
+
     public LevelGenerator levelData;
     public LineRenderer lineRenderer;
     public Agent agent;
-
+    
     public int pathLength = 0;
 
     [ContextMenu("UpdateRender")]
@@ -45,16 +46,11 @@ public class PathFinder : MonoBehaviour
         return neighbors;
     }
 
-
-
-
-
-
     public List<Vector3> FindShortestPath(Vector3 startPos, Vector3 endPos)
     {
         // 1. Collect only Simple prefabs
-        List<Vector3> simpleNodes = levelData.GetAllSimpleNodes();
-
+        List<Vector3> simpleNodes = levelData.GetAllSimpleAndWaterNodes();
+        
         endPos.y = 0;
         startPos.y = 0;
 
@@ -65,7 +61,8 @@ public class PathFinder : MonoBehaviour
         cameFrom[startPos] = startPos;
 
         while (frontier.Count > 0)
-        {
+        {   
+            
             Vector3 current = frontier.Dequeue();
 
             if (current == endPos)
@@ -76,15 +73,19 @@ public class PathFinder : MonoBehaviour
                 if (!cameFrom.ContainsKey(neighbor))
                 {
                     frontier.Enqueue(neighbor);
+                    Debug.Log("i WAS HERE " + current);
                     cameFrom[neighbor] = current;
                 }
             }
         }
-
+        Debug.Log("i WAS HERE 2222 ");
         // 3. Reconstruct Path
         List<Vector3> path = new List<Vector3>();
         if (!cameFrom.ContainsKey(endPos))
+        {
+            Debug.Log("i WAS HERE 333 " + endPos);            
             return path; // no path found
+        }
 
         Vector3 curr = endPos;
         while (curr != startPos)

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,6 +10,20 @@ using UnityEditor;
 public class LevelDimensionBoundary
 {
     public Vector2Int dimension;
+}
+
+[System.Serializable]
+public class LevelData
+{
+    [FormerlySerializedAs("dimensions")] public Vector2Int dimension;
+    public List<PlacedGroupData> groups = new();
+}
+
+[System.Serializable]
+public class PlacedGroupData
+{
+    public string typeName;
+    public List<Vector3> positions = new();
 }
 
 
@@ -47,7 +62,7 @@ public class LevelGenerator : MonoBehaviour
     public List<PlacedPrefabGroup> placedPrefabGroups = new List<PlacedPrefabGroup>();
     public int selectedPrefabIndex = 0;
     public LevelDimensionBoundary levelDimension;
-
+    [HideInInspector] public string levelName = "MyLevel";
     [ContextMenu("ASD")]
     public void CreateGrid()
     {
@@ -115,7 +130,6 @@ public class LevelGenerator : MonoBehaviour
                     GameObject newParent = new GameObject(selectedPrefabType.name);
                     newParent.transform.parent = transform;
                     obj.transform.parent = newParent.transform;
-
                 }
             }
 
@@ -173,6 +187,15 @@ public class LevelGenerator : MonoBehaviour
         if (previewObject != null)
         {
             previewObject.transform.position = worldPos;
+        }
+    }
+
+    public void RemovePreview()
+    {
+        if (previewObject != null && selectedPrefabType != null)
+        {
+            DestroyImmediate(previewObject);
+            previewObject = null;
         }
     }
 
@@ -266,6 +289,23 @@ public class LevelGenerator : MonoBehaviour
         return simpleNodes;
     }
     
+    public List<Vector3> GetAllWaterNodes()
+    {
+        List<Vector3> simpleNodes = new List<Vector3>();
+        foreach (var group in placedPrefabGroups)
+        {
+            // Debug.Log("group.typeName" + group.typeName);
+            if (group.typeName.ToLower().Contains("lake")) // adjust as needed
+            {
+                foreach (var placed in group.prefabs)
+                {
+                    simpleNodes.Add(placed.position);
+                }
+            }
+        }
+        return simpleNodes;
+    }
+    
     
     public List<Vector3> GetAllHurdlesNodes()
     {
@@ -281,6 +321,113 @@ public class LevelGenerator : MonoBehaviour
             }
         }
         return hurdles;
+    }
+    
+    public List<Vector3> GetAllSimpleAndWaterNodes()
+    {
+        List<Vector3> hurdles = new List<Vector3>();
+        foreach (var group in placedPrefabGroups)
+        {
+            if (group.typeName.ToLower().Contains("simple") || group.typeName.ToLower().Contains("lake")) // adjust as needed
+            {
+                foreach (var placed in group.prefabs)
+                {
+                    hurdles.Add(placed.position);
+                }
+            }
+        }
+        return hurdles;
+    }
+    
+    public List<Vector3> GetAllHurdleAndWaterNodes()
+    {
+        List<Vector3> hurdles = new List<Vector3>();
+        foreach (var group in placedPrefabGroups)
+        {
+            if (group.typeName.ToLower().Contains("hurdle") || group.typeName.ToLower().Contains("lake")) // adjust as needed
+            {
+                foreach (var placed in group.prefabs)
+                {
+                    hurdles.Add(placed.position);
+                }
+            }
+        }
+        return hurdles;
+    }
+ 
+    
+    private void OnDisable()
+    {
+#if UNITY_EDITOR
+        RemovePreview();
+#endif
+    }
+
+    private void OnDestroy()
+    {
+#if UNITY_EDITOR
+        RemovePreview();
+#endif
+    }
+    
+    
+    public void SaveLevel(string fileName)
+    {
+        LevelData levelData = new();
+
+        levelData.dimension = levelDimension.dimension;
+        
+        foreach (var group in placedPrefabGroups)
+        {
+            PlacedGroupData groupData = new() { typeName = group.typeName };
+            foreach (var placed in group.prefabs)
+            {
+                groupData.positions.Add(placed.position);
+            }
+            levelData.groups.Add(groupData);
+        }
+
+        string json = JsonUtility.ToJson(levelData, true);
+        System.IO.File.WriteAllText($"Assets/Resources/Levels/{fileName}.json", json);
+
+#if UNITY_EDITOR
+        AssetDatabase.Refresh();
+#endif
+
+        Debug.Log($"Level saved: {fileName}");
+    }
+    
+    public void LoadLevel(string fileName)
+    {
+        ClearAll();
+
+        string path = $"Levels/{fileName}";
+        TextAsset jsonAsset = Resources.Load<TextAsset>(path);
+        if (jsonAsset == null)
+        {
+            Debug.LogError("Level file not found.");
+            return;
+        }
+
+        LevelData data = JsonUtility.FromJson<LevelData>(jsonAsset.text);
+        
+        // ✨ restore dimensions
+        levelDimension.dimension = data.dimension;
+        
+        foreach (var group in data.groups)
+        {
+            int prefabIndex = prefabTypes.FindIndex(p => p.name == group.typeName);
+            if (prefabIndex == -1) continue;
+
+            SetSelectedPrefab(prefabIndex);
+
+            foreach (var pos in group.positions)
+            {
+                PlacePrefab(pos);
+            }
+        }
+
+        Debug.Log($"Level loaded: {fileName}");
     }
     
 }

@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -86,6 +87,27 @@ public class LevelGeneratorEditor : Editor
                 generator.SetSelectedPrefab(selected);
             }
         }
+        
+        GUILayout.Space(10);
+        GUILayout.Label("Level IO", EditorStyles.boldLabel);
+
+        generator.levelName = EditorGUILayout.TextField("Level Name", generator.levelName);
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("💾 Save Level"))
+        {
+            generator.SaveLevel(generator.levelName);
+        }
+
+        if (GUILayout.Button("📂 Load Level"))
+        {
+            generator.LoadLevel(generator.levelName);
+        }
+        GUILayout.EndHorizontal();
+    }
+
+    private void OnDisable()
+    {
+        generator.RemovePreview();
     }
 }
 #endif
