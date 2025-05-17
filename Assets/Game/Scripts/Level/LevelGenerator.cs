@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -397,7 +398,7 @@ public class LevelGenerator : MonoBehaviour
         Debug.Log($"Level saved: {fileName}");
     }
     
-    public void LoadLevel(string fileName)
+    public void LoadLevel(string fileName, TextMeshProUGUI levelInfo = null)
     {
         ClearAll();
 
@@ -405,8 +406,16 @@ public class LevelGenerator : MonoBehaviour
         TextAsset jsonAsset = Resources.Load<TextAsset>(path);
         if (jsonAsset == null)
         {
+            if (levelInfo != null)
+            {
+                levelInfo.text = fileName + ": not found";
+            }
             Debug.LogError("Level file not found.");
             return;
+        }
+        else
+        {
+            levelInfo.text = fileName;
         }
 
         LevelData data = JsonUtility.FromJson<LevelData>(jsonAsset.text);

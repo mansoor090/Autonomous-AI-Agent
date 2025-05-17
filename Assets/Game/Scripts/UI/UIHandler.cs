@@ -1,9 +1,10 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIHandler : MonoBehaviour
 {
-    
+    public LevelGenerator levelGenerator;
     public TextMeshProUGUI myPort;
     public TextMeshProUGUI steps;
     public TextMeshProUGUI episodes;
@@ -12,11 +13,25 @@ public class UIHandler : MonoBehaviour
     public TextMeshProUGUI failureReason;
     public TextMeshProUGUI rate;
 
+	[Header("Level Switcher")]
+	public Button nextButton;
+    public Button previousButton;
+	public TextMeshProUGUI levelInfo;
+
+    private int currentLevel = 0;
+    private const string LEVEL_PREFIX = "Level_";
+    private const int MAX_LEVELS = 100;
 
     private int step_count;
     private int episode_count;
     private int success_count;
     private int failure_count;
+
+   	void Start()
+    {
+        nextButton.onClick.AddListener(NextLevel);
+        previousButton.onClick.AddListener(PreviousLevel);
+    }
     
     public void UpdatePort(int port)
     {
@@ -62,6 +77,23 @@ public class UIHandler : MonoBehaviour
         if(success_count > 0 && failure_count > 0)
             rate.text = "Ratio: " + (((float)success_count / (float)(success_count + failure_count)) * 100).ToString("F1") + "%";
     
+    }
+
+    void NextLevel()
+    {
+        currentLevel++;
+        string levelName = "Level"+currentLevel;
+        levelGenerator.LoadLevel(levelName, levelInfo);
+    }
+
+    void PreviousLevel()
+    {
+        if (currentLevel > 0)
+        {
+            currentLevel--;
+            string levelName = "Level"+currentLevel;
+            levelGenerator.LoadLevel(levelName, levelInfo);
+        }
     }
 
 }

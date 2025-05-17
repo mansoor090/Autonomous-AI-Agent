@@ -73,17 +73,14 @@ public class PathFinder : MonoBehaviour
                 if (!cameFrom.ContainsKey(neighbor))
                 {
                     frontier.Enqueue(neighbor);
-                    Debug.Log("i WAS HERE " + current);
                     cameFrom[neighbor] = current;
                 }
             }
         }
-        Debug.Log("i WAS HERE 2222 ");
         // 3. Reconstruct Path
         List<Vector3> path = new List<Vector3>();
         if (!cameFrom.ContainsKey(endPos))
         {
-            Debug.Log("i WAS HERE 333 " + endPos);            
             return path; // no path found
         }
 
