@@ -151,6 +151,7 @@ public class Agent : MonoBehaviour
             finished = false;
             truncated = true;
             UIHandler.UpdateFailure("Invalid Jump");
+            UIHandler.UpdateFailure(-1, false);
             return new RlResult(reward, finished, truncated, GetObservation());
         }
         

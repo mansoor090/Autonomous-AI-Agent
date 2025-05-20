@@ -86,7 +86,7 @@ public class LevelGenerator : MonoBehaviour
 
     public void PlacePrefab(Vector3 mouseWorldPos)
     {
-#if UNITY_EDITOR
+
         Vector3Int gridPosInt = WorldToGrid(mouseWorldPos);
         Vector3 gridPos = new Vector3(gridPosInt.x, selectedPrefabType.defaultYHeight, gridPosInt.z);
 
@@ -104,8 +104,14 @@ public class LevelGenerator : MonoBehaviour
             {
                 gridPos.z = 0;
             }
-            
-            GameObject obj = PrefabUtility.InstantiatePrefab(selectedPrefabType.prefab) as GameObject;
+            GameObject obj;
+            #if UNITY_EDITOR
+            obj = PrefabUtility.InstantiatePrefab(selectedPrefabType.prefab) as GameObject;
+            #endif
+
+            #if !UNITY_EDITOR
+            obj =             Instantiate(selectedPrefabType.prefab) as GameObject;
+            #endif
             
             int childCount = transform.childCount;
 
@@ -149,7 +155,7 @@ public class LevelGenerator : MonoBehaviour
                 prefab = obj
             });
         }
-#endif
+
     }
 
     public void RemovePrefab(Vector3 mouseWorldPos)
@@ -415,7 +421,11 @@ public class LevelGenerator : MonoBehaviour
         }
         else
         {
-            levelInfo.text = fileName;
+
+            if (levelInfo)
+            {
+                levelInfo.text = fileName;
+            }
         }
 
         LevelData data = JsonUtility.FromJson<LevelData>(jsonAsset.text);
