@@ -106,6 +106,8 @@ public class Agent : MonoBehaviour
     public RlResult Step(string action)
     {
         reward = 0;
+        stepCount += 1;
+        UIHandler.UpdateSteps(1);
 
         Vector3 direction = Vector3.zero;
 
@@ -151,7 +153,7 @@ public class Agent : MonoBehaviour
             finished = false;
             truncated = true;
             UIHandler.UpdateFailure("Invalid Jump");
-            UIHandler.UpdateFailure(-1, false);
+            UIHandler.UpdateFailure(1, false);
             return new RlResult(reward, finished, truncated, GetObservation());
         }
         
@@ -183,7 +185,6 @@ public class Agent : MonoBehaviour
         }
 
         simulation.Simulate();
-        stepCount += 1;
 
         // CHECK IF THE DOG HAS REACHED THE TARGET
         if (Vector3.SqrMagnitude(transform.position - target.transform.position) < 0.1f)
@@ -203,7 +204,7 @@ public class Agent : MonoBehaviour
             UIHandler.UpdateFailure(1, false);
         }
         
-        UIHandler.UpdateSteps(1);
+       
         if (stepCount >= 1000)
         {
             Debug.Log("Ending Episode: Timeout");
