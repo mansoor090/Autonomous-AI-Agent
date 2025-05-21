@@ -46,7 +46,7 @@ public class UIHandler : MonoBehaviour
     public void UpdateEpisodes(int amount)
     {
         episode_count++;
-        episodes.text = "EP: " + episode_count.ToString();
+        episodes.text = "Total: " + episode_count.ToString();
     }
 
 
